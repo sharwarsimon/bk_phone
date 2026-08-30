@@ -13,21 +13,26 @@ export const SubcategoryCard: React.FC<SubcategoryCardProps> = ({ subcategory, o
     <div
       id={`subcat-card-${subcategory.slug}`}
       onClick={onClick}
-      className="group relative flex flex-col items-center justify-center p-3 sm:p-4 bg-white rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md hover:border-orange-400/80 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer active:scale-95 text-center min-h-[96px] sm:min-h-[110px]"
+      className="group relative flex flex-col items-center justify-center p-2 sm:p-3 bg-[#F0F2F5] hover:bg-white rounded-xl border border-[#E4E6EB] hover:border-[#1877F2]/60 hover:shadow-xs transition-all duration-150 cursor-pointer active:scale-95 text-center min-h-[86px] sm:min-h-[96px] w-full"
     >
-      {/* Icon Container */}
-      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-orange-50 text-orange-600 group-hover:bg-orange-600 group-hover:text-white flex items-center justify-center mb-2 transition-all duration-200 shadow-xs">
-        <DynamicIcon name={subcategory.icon} className="w-6 h-6 sm:w-7 sm:h-7" />
+      {/* Illustrated Icon Container */}
+      <div className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center mb-1 transition-transform duration-150 group-hover:scale-105">
+        <DynamicIcon 
+          name={subcategory.icon} 
+          slug={subcategory.slug} 
+          title={subcategory.name} 
+          className="w-9 h-9 sm:w-10 sm:h-10 object-contain" 
+        />
       </div>
 
       {/* Bengali Title */}
-      <span className="text-xs sm:text-sm font-bold text-gray-800 group-hover:text-orange-600 leading-tight transition-colors line-clamp-1">
+      <span className="text-[11px] sm:text-xs font-bold text-[#050505] group-hover:text-[#1877F2] leading-tight transition-colors line-clamp-1">
         {subcategory.name}
       </span>
 
       {/* Optional English Subtitle */}
       {subcategory.name_en && (
-        <span className="text-[10px] sm:text-[11px] text-gray-400 leading-none mt-0.5 hidden sm:block truncate max-w-full">
+        <span className="text-[10px] text-[#65676B] leading-none mt-0.5 hidden sm:block truncate max-w-full">
           {subcategory.name_en}
         </span>
       )}

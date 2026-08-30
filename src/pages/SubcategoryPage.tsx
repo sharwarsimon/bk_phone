@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Phone, Search, MapPin, CheckCircle2, ChevronRight, PlusCircle } from 'lucide-react';
+import { ArrowLeft, Search, LayoutList, LayoutGrid, PlusCircle } from 'lucide-react';
 import { api } from '../services/api.js';
 import { Subcategory, Category, Listing } from '../types.js';
 import { ListingCard } from '../components/common/ListingCard.js';
@@ -21,6 +21,7 @@ export const SubcategoryPage: React.FC<SubcategoryPageProps> = ({
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchFilter, setSearchFilter] = useState('');
+  const [viewMode, setViewMode] = useState<'list' | 'card'>('list');
 
   useEffect(() => {
     const fetchSubcategoryData = async () => {
@@ -54,10 +55,10 @@ export const SubcategoryPage: React.FC<SubcategoryPageProps> = ({
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-4">
-        <div className="h-28 bg-orange-600 rounded-3xl animate-pulse" />
+        <div className="h-24 bg-orange-500 rounded-3xl animate-pulse" />
         <div className="space-y-3">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-28 bg-white rounded-2xl animate-pulse" />
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-20 bg-white rounded-2xl animate-pulse border border-gray-200" />
           ))}
         </div>
       </div>
@@ -79,106 +80,125 @@ export const SubcategoryPage: React.FC<SubcategoryPageProps> = ({
     );
   }
 
+  const pageHeaderTitle = subcategory.name_en ? `${subcategory.name_en} List` : `${subcategory.name} তালিকা`;
+
   return (
-    <div className="min-h-screen pb-16">
-      {/* Subcategory Header */}
-      <div className="bg-gradient-to-r from-orange-600 to-orange-700 text-white py-6 px-4 shadow-sm">
-        <div className="max-w-5xl mx-auto space-y-3">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-1.5 text-xs text-orange-100 font-medium overflow-x-auto whitespace-nowrap">
-            <button onClick={() => navigate('/')} className="hover:text-white">
-              হোম
-            </button>
-            <ChevronRight className="w-3.5 h-3.5 opacity-60" />
-            <button
-              onClick={() => navigate(`/category/${categorySlug}`)}
-              className="hover:text-white"
-            >
-              {category?.name || 'ক্যাটাগরি'}
-            </button>
-            <ChevronRight className="w-3.5 h-3.5 opacity-60" />
-            <span className="text-white font-bold">{subcategory.name}</span>
-          </nav>
-
-          <div className="flex items-center justify-between gap-4 pt-1">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-white text-orange-600 flex items-center justify-center shadow-md shrink-0">
-                <DynamicIcon name={subcategory.icon} className="w-7 h-7" />
-              </div>
-              <div>
-                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white">
-                  {subcategory.name} তালিকা
-                </h1>
-                {subcategory.name_en && (
-                  <span className="text-xs text-orange-100 font-medium">
-                    {subcategory.name_en} List
-                  </span>
-                )}
-              </div>
-            </div>
-
+    <div className="min-h-screen pb-16 bg-[#F3F4F6]">
+      {/* High Density Top App Bar matching Screenshot 3 */}
+      <div className="bg-[#FF9800] text-white py-3.5 px-4 shadow-sm sticky top-0 z-30">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <button
               id="subcat-back-btn"
               onClick={() => navigate(`/category/${categorySlug}`)}
-              className="hidden sm:inline-flex items-center gap-1 text-xs font-bold bg-orange-800/40 text-orange-100 hover:text-white px-3 py-1.5 rounded-xl border border-orange-400/20 transition-colors"
+              className="p-1.5 -ml-1 text-white hover:bg-orange-600 rounded-full transition-colors active:scale-95"
+              aria-label="Back"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              পূর্ববর্তী পাতা
+              <ArrowLeft className="w-6 h-6 stroke-[2.5]" />
             </button>
+            <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight">
+              {pageHeaderTitle}
+            </h1>
           </div>
 
-          {subcategory.description && (
-            <p className="text-xs sm:text-sm text-orange-50 max-w-xl leading-relaxed">
-              {subcategory.description}
-            </p>
-          )}
+          {/* Right Action: Add Listing shortcut */}
+          <button
+            id="subcat-add-listing-shortcut"
+            onClick={() => navigate('/add-listing')}
+            className="flex items-center gap-1 text-xs font-bold bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-full transition-all active:scale-95"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span className="hidden sm:inline">লিস্টিং যোগ করুন</span>
+          </button>
         </div>
       </div>
 
-      {/* Main Listing List Area */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 mt-6 space-y-4">
-        {/* Search & Filter Bar */}
-        <div className="bg-white rounded-2xl p-3 sm:p-4 border border-gray-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="relative w-full sm:max-w-md">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+      {/* Main Content Area */}
+      <main className="max-w-4xl mx-auto px-3 sm:px-4 py-4 space-y-3">
+        {/* Search & View Switcher Bar */}
+        <div className="bg-white rounded-2xl p-2.5 sm:p-3 border border-gray-200/90 shadow-2xs flex items-center justify-between gap-2">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
             <input
               id="subcat-listing-search"
               type="text"
-              placeholder={`${subcategory.name} এর মধ্যে নাম, এলাকা বা ফোন দিয়ে খুঁজুন...`}
+              placeholder={`${subcategory.name} এ সার্চ করুন...`}
               value={searchFilter}
               onChange={(e) => setSearchFilter(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:bg-white transition-all"
+              className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:bg-white transition-all"
             />
           </div>
 
-          <div className="text-xs font-semibold text-gray-500 shrink-0">
-            মোট লিস্টিং: <span className="text-orange-600 font-bold">{filteredListings.length}</span> টি
+          {/* View Mode Toggle */}
+          <div className="flex items-center bg-gray-100 p-1 rounded-xl shrink-0">
+            <button
+              id="view-mode-list-btn"
+              onClick={() => setViewMode('list')}
+              className={`p-1.5 rounded-lg transition-colors ${
+                viewMode === 'list' ? 'bg-white text-orange-600 shadow-2xs' : 'text-gray-500 hover:text-gray-800'
+              }`}
+              title="লিস্ট ভিউ"
+            >
+              <LayoutList className="w-4 h-4" />
+            </button>
+            <button
+              id="view-mode-card-btn"
+              onClick={() => setViewMode('card')}
+              className={`p-1.5 rounded-lg transition-colors ${
+                viewMode === 'card' ? 'bg-white text-orange-600 shadow-2xs' : 'text-gray-500 hover:text-gray-800'
+              }`}
+              title="কার্ড ভিউ"
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
-        {/* Listings Grid */}
+        {/* Listings in High Density Layout */}
         {filteredListings.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {filteredListings.map((listing) => (
-              <ListingCard
-                key={listing.id}
-                listing={listing}
-                onClick={() => navigate(`/listing/${listing.slug}`)}
-              />
-            ))}
-          </div>
+          viewMode === 'list' ? (
+            <div className="space-y-2">
+              {filteredListings.map((listing) => (
+                <ListingCard
+                  key={listing.id}
+                  listing={listing}
+                  variant="list"
+                  onClick={() => navigate(`/listing/${listing.slug}`)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {filteredListings.map((listing) => (
+                <ListingCard
+                  key={listing.id}
+                  listing={listing}
+                  variant="card"
+                  onClick={() => navigate(`/listing/${listing.slug}`)}
+                />
+              ))}
+            </div>
+          )
         ) : (
-          <div className="bg-white rounded-2xl p-10 text-center border border-gray-200/80 space-y-3">
+          <div className="bg-white rounded-2xl p-10 text-center border border-gray-200/90 space-y-3 mt-4">
             <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center mx-auto">
               <Search className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold text-gray-800">কোনো লিস্টিং খুঁজে পাওয়া যায়নি</h3>
+            <h3 className="text-base font-bold text-gray-800">কোনো তথ্য বা লিস্টিং পাওয়া যায়নি</h3>
             <p className="text-xs text-gray-500 max-w-sm mx-auto">
-              এই উপ-বিভাগে এখনো কোনো তথ্য বা লিস্টিং যুক্ত করা হয়নি অথবা আপনার সার্চের সাথে মিলছে না।
+              {searchFilter ? 'আপনার সার্চের সাথে কোনো ফলাফল মেলেনি।' : 'এই উপ-বিভাগে এখনো কোনো লিস্টিং যুক্ত করা হয়নি। আপনি চাইলে নতুন লিস্টিং যোগ করতে পারেন।'}
             </p>
+            <button
+              onClick={() => navigate('/add-listing')}
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-orange-600 text-white rounded-xl text-xs font-bold shadow-xs hover:bg-orange-700 active:scale-95 transition-all"
+            >
+              <PlusCircle className="w-4 h-4" />
+              নতুন লিস্টিং যুক্ত করুন
+            </button>
           </div>
         )}
       </main>
     </div>
   );
 };
+

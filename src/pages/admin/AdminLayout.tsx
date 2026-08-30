@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   LayoutDashboard, 
   Layers, 
@@ -127,7 +128,17 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ currentPath, navigate,
 
       {/* Main Content Pane */}
       <main className="flex-1 min-w-0 p-4 sm:p-6 md:p-8 overflow-y-auto">
-        {children}
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={currentPath}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.2, ease: [0.25, 1, 0.5, 1] }}
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
       </main>
     </div>
   );
